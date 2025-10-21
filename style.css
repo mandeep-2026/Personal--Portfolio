@@ -1,0 +1,392 @@
+:root {
+    --primary: #0a3d62;
+    --secondary: #1e90ff;
+    --light: #f4f8ff;
+    --dark: #001f3f;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --page-w: min(85vw, 800px);
+    --page-h: min(90vh, 1100px);
+}
+
+body {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: var(--dark);
+    overflow: hidden;
+    position: relative;
+}
+
+
+/* Subtle background animation for engagement */
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    animation: float 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(1deg);
+    }
+}
+
+.book-wrap {
+    perspective: 2000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: transform 0.3s ease;
+}
+
+.book-wrap:hover {
+    transform: translateY(-5px);
+}
+
+.book {
+    width: var(--page-w);
+    height: var(--page-h);
+    position: relative;
+    transform-style: preserve-3d;
+    padding-left: 10px;
+    animation: entrance 0.5s ease-out;
+}
+
+@keyframes entrance {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 10px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--primary), var(--dark));
+    border-radius: 5px 0 0 5px;
+    box-shadow: -2px 0 10px var(--shadow);
+    z-index: 0;
+}
+
+.page {
+    width: 100%;
+    height: 100%;
+    background: var(--light);
+    position: absolute;
+    top: 0;
+    left: 10px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px var(--shadow);
+    backface-visibility: hidden;
+    transform-origin: left center;
+    transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55), box-shadow 0.5s ease, border-radius 1.2s ease, opacity 0.5s ease;
+    overflow: hidden;
+    z-index: 1;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+    border-radius: 0 12px 12px 0;
+    transform: skewY(-5deg);
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    z-index: 2;
+}
+
+.page.flipping-forward::before,
+.page.flipping-backward::before {
+    opacity: 1;
+}
+
+.page.flipped {
+    transform: rotateY(-180deg) scale(0.98);
+    box-shadow: -10px 0 40px var(--shadow);
+    border-radius: 12px 0 0 12px;
+    z-index: 1;
+    opacity: 0;
+}
+
+.page.active {
+    box-shadow: 0 15px 50px rgba(30, 144, 255, 0.4);
+    transform: scale(1.02) rotateY(0deg);
+    z-index: 100;
+    opacity: 1;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        box-shadow: 0 15px 50px rgba(30, 144, 255, 0.4);
+    }
+    50% {
+        box-shadow: 0 15px 60px rgba(30, 144, 255, 0.6);
+    }
+}
+
+.page.flipping-forward,
+.page.flipping-backward {
+    animation: none !important;
+}
+
+.page.flipping-forward {
+    transform: rotateY(-180deg) scale(0.98);
+    z-index: 50;
+}
+
+.page.flipping-backward {
+    transform: rotateY(180deg) scale(0.98);
+    z-index: 50;
+    border-radius: 0 12px 12px 0;
+}
+
+.page.flipping-backward::before {
+    right: auto;
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+    border-radius: 12px 0 0 12px;
+    transform: skewY(5deg);
+}
+
+.page.stacked {
+    opacity: 0.05;
+    transform: scale(0.98);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1), 0 5px 20px var(--shadow);
+    z-index: auto;
+    border-radius: 8px;
+}
+
+.page:hover {
+    transform: scale(1.05);
+    z-index: 101;
+}
+
+.inner {
+    padding: 30px 40px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-grow: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary) var(--light);
+}
+
+.inner::-webkit-scrollbar {
+    width: 6px;
+}
+
+.inner::-webkit-scrollbar-track {
+    background: var(--light);
+}
+
+.inner::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border-radius: 3px;
+}
+
+.cover-content {
+    background: white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.profile-img {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 5px solid var(--secondary);
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.2rem;
+    color: var(--primary);
+}
+
+.title {
+    color: var(--secondary);
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.contact {
+    color: #333;
+    margin: 4px 0;
+    font-size: 1rem;
+}
+
+h2 {
+    color: var(--primary);
+    border-bottom: 2px solid var(--secondary);
+    padding-bottom: 5px;
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+ul {
+    padding-left: 20px;
+    margin-top: 10px;
+    flex-grow: 1;
+}
+
+li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.section p {
+    margin-bottom: 15px;
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+
+/* ✅ Controls fixed outside the book pages */
+
+.controls {
+    position: fixed;
+    right: 30px;
+    /* distance from right */
+    bottom: 50px;
+    /* distance from bottom */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+    /* spacing between buttons */
+    z-index: 9999;
+}
+
+
+/* ✅ Button styling */
+
+.btn {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 5px 12px var(--shadow);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.btn:hover {
+    background: #0077e6;
+    transform: scale(1.05);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* Page Indicator */
+
+.page-indicator {
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dot.active {
+    background: var(--secondary);
+    transform: scale(1.3);
+    box-shadow: 0 0 10px var(--secondary);
+}
+
+.dot:hover {
+    background: white;
+    transform: scale(1.2);
+}
+
+
+/* Fullscreen Mode */
+
+:fullscreen .controls,
+:-webkit-full-screen .controls,
+:-moz-full-screen .controls {
+    right: 25px;
+    bottom: 25px;
+    gap: 12px;
+}
+
+
+/* Mobile Responsiveness */
+
+@media (max-width: 768px) {
+     :root {
+        --page-w: 95vw;
+        --page-h: 95vh;
+    }
+    .controls {
+        right: 15px;
+        bottom: 15px;
+        gap: 10px;
+    }
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
